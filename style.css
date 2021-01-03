@@ -13,6 +13,7 @@ section{
     align-items: center;
     box-shadow: 0 0 2rem rgba(0, 0, 0, .2);
     max-width: 18rem;
+    text-align: center;
 }
 
 img{

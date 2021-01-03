@@ -1,8 +1,10 @@
-
-
-
-const api = 'https://restcountries.eu/rest/v2/all/'
-
+/* Html element selectors */
+let h1 = document.querySelectorAll('h1');
+let img = document.querySelectorAll('img')
+let h3 = document.querySelectorAll('h3');
+/* Api:et */
+const api = 'https://restcountries.eu/rest/v2/all/';
+/* Fetch för Api:et */
 fetch(api).then(
     function(r){
         if(r.status === 404){
@@ -18,7 +20,6 @@ fetch(api).then(
     }
 ).catch(
     function(error){
-        
         if(error === 'Not found'){
             console.log(error)
         }
@@ -27,76 +28,60 @@ fetch(api).then(
 
 
 
-function showCountries(data){
-    let countries = [];
-    let time = [];
-    let flag = [];   
-        for(let i = 0; i<3;i++){
-            let random = Math.floor(Math.random()* data.length);
-            
+    function showCountries(data){
+        let countries = [];
+            /* For loop som loopar igenom 3 gånger, varje gång genereras ett random nummer som sedan används för att komma åt ett random land i datan från apiet. Använder Country mallen för att fylla i informationen i de olika parametrarna och pushar sedan in objektet i countries arrayn */
+            for(let i = 0; i<3;i++){
+                let random = Math.floor(Math.random()* data.length);
+                countries.push(
+                    new Country(data[random].name, data[random].timezones[0], data[random].flag)
+                )
+            }
+            /* For loop som loopar igenom objekten i countries arrayn och lägger sedan till informationen i html dokumentet för att presentera för användaren*/
+            for(let i=0; countries.length; i++){
+                h1[i].innerText = countries[i].name
+                img[i].src = countries[i].flag
+                h3[i].innerText = countries[i].countryTime();
+            }
+        }
+        
+        /* Constructor funktion för landet med 3 olika egenskaper och parametrar */
+        function Country(name, timezone, flag){
+            this.name = name;
+            this.timezone = timezone;
+            this.flag = flag;
+        }
+        /* Funktion för att lägga till en nolla framför om det behövs, dvs om numret är mindre än 10 */
+        function addZero(i) { 
+            if (i < 10) {
+              i = "0" + i;
+            }
+            return i;
+          }
 
-            countries.push(
-                new CountryName(data[random].name)
-            )
-            time.push(
-                new CountryTime(data[random].timezones[0])
-            )
-            flag.push(
-                new CountryFlags(data[random].flag)
-            )
-            
-        }
-        console.log(countries)
-        
-        
-        for(countryNames of countries){
-            countryNames.countryName();
-        }
-            
-        for(countryTime of time){
-            countryTime.countryTime();
-        }
+            Country.prototype.countryTime = function(){
+                let date = new Date(); //Variabel date som skapar nyvarande datum och tid.
+                
+                let h = date.getUTCHours() //Hämtar UTC timmarna från date
+                let m = addZero(date.getUTCMinutes()); //Hämtar UTC minuterna från date och använder funktionen addZero för att lägga till en nolla om det behövs.
 
-        for(countryFlag of flag){
-            countryFlag.countryFlag();
-        }
-            
-    }
+                let UTCHours = Number((this.timezone).substr(3, 3)); //Plockar ut +/- tecknet från UTC-landet och numret som är kokpplat till landet, görs även om till nummer så vi kan använda det returnerade värdet i en kalkylation.
+                
+                let calcHours = Number(h) + UTCHours; //Kalkylation som beräknar vad klockan är i landet.
+                console.log(UTCHours)
+                console.log(calcHours)
+                
+                    if(calcHours < 0){ //Kalkylation som beräknar klockan i landet om calcHours skulle returnera ett nummer som är mindre än 0.
+                        calcHours =  24 + (h + UTCHours);
+                    }
+                    else if(calcHours >= 24){ //Kalkylation som beräknar klockan i landet om calcHours skulle returnera ett nummer som är större eller lika med 24.
+                        calcHours =  (h + UTCHours) - 24 ;
+                    }
+
+                let time = `${addZero(calcHours)}:${m}` //Temperal literal för att skriva ut den kalkylerade timmen samt lägger till en nolla framför om det behövs och minuterna
+                return time;
+                
+            } 
     
-    
-function CountryName(name){
-    this.name = name;
-}
-function CountryTime(time){
-    this.time = time
-}
-function CountryFlags(flag){
-    this.flag = flag
-}
-    
-    CountryName.prototype.countryName = function(){
-        let h1 = document.querySelectorAll('h1');
-        for(let i = 0; i<3;i++){
-            h1[i].innerText = this.name
-        }
-        
-    }
-    
-    
-    CountryTime.prototype.countryTime = function(){
-        let h3 = document.querySelectorAll('h3');
-        
-        for(let i = 0; i<3;i++){ 
-            h3[i].innerText = this.time
-        }
-        
-        
-    } 
-    CountryFlags.prototype.countryFlag = function(){
-        let img = document.querySelectorAll('img')
-        for(let i = 0; i<3;i++){
-            img[i].src = this.flag
-        }
-    }
     
     
